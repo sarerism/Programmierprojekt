@@ -1,0 +1,35 @@
+# Compiled class files
+bin/
+*.class
+
+# Large data files
+*.fmi
+*.hgt
+srtm/
+
+# Output files
+*_output.txt
+my_output.txt
+barycentric_output.txt
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.jar
+*.war
+*.ear
