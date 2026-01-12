@@ -16,23 +16,22 @@ public class Benchmark {
             return;
         }
         
-        // Read parameters (parameters are expected in exactly this order)
         String graphPath = args[1];
         double lon = Double.parseDouble(args[3]);
         double lat = Double.parseDouble(args[5]);
         String quePath = args[7];
         int sourceNodeId = Integer.parseInt(args[9]);
 
-        // Run benchmarks
         System.out.println("Reading graph file and creating graph data structure (" + graphPath + ")");
         long graphReadStart = System.currentTimeMillis();
         
         Graph graph = null;
         try {
-            // Read the graph structure
+
+
             graph = GraphReader.readGraph(graphPath);
             
-            // Determine SRTM directory (should be in same directory as graph file)
+            
             File graphFile = new File(graphPath);
             String graphDir = graphFile.getParent();
             if (graphDir == null) {
@@ -43,7 +42,7 @@ public class Benchmark {
             System.out.println("Reading elevation data from: " + srtmDir);
             ElevationReader elevationReader = new ElevationReader(srtmDir);
             
-            // Set elevations for all nodes
+            
             System.out.println("Computing node elevations...");
             long elevStart = System.currentTimeMillis();
             for (int i = 0; i < graph.getNodeCount(); i++) {
@@ -62,7 +61,7 @@ public class Benchmark {
             System.out.println("Elevation processing completed in " + (elevEnd - elevStart) + "ms");
             System.out.println("Cached " + elevationReader.getCacheSize() + " elevation files");
             
-            // Update edge elevation gains
+            
             GraphReader.updateEdgeElevations(graph);
             
         } catch (Exception e) {

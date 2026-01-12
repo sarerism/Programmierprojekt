@@ -14,12 +14,16 @@ javac -d bin \
     src/io/GraphReader.java \
     src/io/ElevationReader.java \
     src/routing/Dijkstra.java \
-    src/routing/NodeFinder.java
+    src/routing/NodeFinder.java \
+    src/routing/DijkstraWithPath.java \
+    src/routing/RouteService.java \
+    src/server/WebServer.java
 
 if [ $? -eq 0 ]; then
     
     echo ""
     echo "Cooked successfully!"
+    echo ""
     echo "Output directory: bin/"
     echo ""
     echo "To run benchmark, run the command below :"

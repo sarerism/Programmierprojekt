@@ -137,7 +137,7 @@ public class Graph {
     }
 
     /**
-     * Returns memory usage estimate in bytes.
+     * Returns memory usage estimate in bytes
      */
 
     public long estimateMemoryUsage() {

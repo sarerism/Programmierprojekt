@@ -11,7 +11,7 @@ import java.util.Map;
  * 
  * Each .hgt file contains a grid of elevation 
  * 
- * Each elevation value is stored as a 2-byte signed integer
+ * Each elevation value is stored as a 2 byte signed integer
  * Data is ordered from North to South, West to East
  */
 
@@ -191,7 +191,7 @@ public class ElevationReader {
     }
     
     /**
-     * Clears the cache to free memory.
+     * Clears the cache to free memory
      */
     
     public void clearCache() {

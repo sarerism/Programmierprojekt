@@ -1,140 +1,107 @@
-# Bicycle Route Planner - Programmierprojekt
+# Bicycle Route Planner - Programmierprojekt - Sareer Ahmed
 
-**Student Project - University of Stuttgart**  
-**Course:** Programmierprojekt (6 ECTS)  
-**Language:** Java  
-**Submission:** Phase I - January 6, 2026
+Phase I submission for Programmierprojekt
 
-## Overview
+## What it does
 
-This project implements a bicycle route planner for Germany that computes optimal routes considering both distance and elevation gain. The system processes large-scale graphs with millions of nodes and edges, using Dijkstra's algorithm to find shortest paths weighted by user preferences between minimizing distance and avoiding hills.
+Calculates bicycle routes in Germany that minimize either distance or elevation gain (or something in between ) Uses Dijkstra on a graph with 12M+ nodes
 
-## Implementation
+The program reads a large graph file (.fmi format), loads elevation data from NASA SRTM files, and computes shortest paths based on a weighted cost function combining distance and uphill climbing
 
-Phase I includes the following components:
+## Requirements
 
-- **Graph Processing:** Adjacency array data structure for efficient storage of large graphs (12+ million nodes)
-- **Shortest Path Algorithm:** Dijkstra's algorithm with priority queue for one-to-one and one-to-all queries
-- **Elevation Integration:** NASA SRTM elevation data with bilinear interpolation for accurate elevation calculation
-- **Cost Function:** Weighted combination of distance and positive elevation gain
-- **Node Lookup:** Efficient nearest node finder for GPS coordinates
+- Java 17 or newer
+- At least 8GB RAM for bw-bicycle.fmi, 12GB for germany-bicycle.fmi
+- Graph files (.fmi) and elevation data (srtm/*.hgt) need to be in the same directory
 
-## Project Structure
+## Compilation
 
-```
-├── src/implementation
-│   │   ├── Node.java               # Node with coordinates and elevation
-│   │   └── Edge.java               # Edge with distance and elevation gain
-│   ├── io/
-│   │   ├── GraphReader.java        # FMI format parser
-│   │   └── ElevationReader.java    # SRTM HGT file reader with caching
-│   └── routing/
-│       ├── Dijkstra.java           # Shortest path algorithms
-│       └── NodeFinder.java         # GPS to node mapping
-├── Benchmark.java                   # Main benchmark program
-├── build.sh                         # Build script
-├── test.sh                          # Test script
-├── srtm/                            # SRTM elevation data (.hgt files)
-├── bw-bicycle.fmi                   # Baden-Württemberg graph
-├── germany-bicycle.fmi              # Full Germany graph
-└── README.md elevation data
-├── build.sh                        # Simple build script
-└── README.md                       # This file
-```
+On Ubuntu 20.04 (or similar):
 
-## Building and Running
-ation
-```bash
-./build.sh
-```
-
-Or manually:
 ```bash
 javac -d bin src/graph/*.java src/io/*.java src/routing/*.java Benchmark.java
 ```
 
-### Running Benchmark
+Or just use the build script ;)
 
-Test with Baden-Württemberg dataset (12.4M nodes):
+```bash
+./build.sh
+```
+
+## Running the Benchmark
+
+Basic format:
+```bash
+echo "0" | java -Xmx8g -cp bin Benchmark \
+  -graph <graph-file>.fmi \
+  -que <query-file>.que \
+  -lon <longitude> \
+  -lat <latitude> \
+  -s <random-seed>
+```
+
+Example with Baden-Württemberg:
 ```bash
 echo "0" | java -Xmx8g -cp bin Benchmark \
   -graph bw-bicycle.fmi \
+  -que bw-bicycle.que \
   -lon 9.098 \
   -lat 48.746 \
-  -que bw-bicycle.que \
   -s 0
 ```
 
-Full Germany dataset:
+Example with full Germany graph:
 ```bash
 echo "0" | java -Xmx12g -cp bin Benchmark \
   -graph germany-bicycle.fmi \
+  -que germany-bicycle.que \
   -lon 9.098 \
   -lat 48.746 \
-  -que germany-bicycle.que \
-  -s 0a/bw-bicycle.que \
-  -s 12345Achieved
+  -s 638394
+```
 
-Tested on MacBook M4 Max with 128GB RAM using Baden-Württemberg dataset (12.4M nodes, 26M edges):
+The `echo "0"` is because the benchmark asks for the weight parameter (0 = minimize elevation, 1 = minimize distance).
 
-- **Graph loading:** ~10.5 seconds ✓
-- **Elevation loading:** ~5 seconds ✓
-- **Edge updates:** ~0.4 seconds ✓
-- **One-to-all Dijkstra:** ~1.9 seconds ✓
-- **Nearest node lookup:** ~15 milliseconds ✓
-- **Memory usage:** ~630 MB for graph ✓
+## How it works
 
-All performance requirements met with significant headroom.
+**Graph structure:** Adjacency arrays (one array for nodes, one for edges, offset array to map between them)Loads the entire graph into memory at startup.
 
-## Algorithm Details
+**Elevation data:** Reads .hgt files on-demand and caches them. Each file is a 3601×3601 grid of elevation values. Uses barycentric interpolation to get elevation at arbitrary coordinates
 
-### Graph Representation
-Uses adjacency array for memory efficiency:
-- All nodes stored in contiguous array
-- All edges stored in single array
-- Offset array maps nodes to their edge ranges
-- Constant-time edge access for each node
+**Routing:** Standard Dijkstra with a priority queue. For one-to-one queries it stops early when the target is found. For one-to-all it runs until all reachable nodes are processed
 
-### Elevation Calculation
-- SRTM data stored in 3601×3601 grids per degree tile
-- Bilinear interpolation for sub-grid accuracy
-- LRU caching of loaded .hgt files
-- Elevation stored in centimeters as integers
+**Cost function:** `cost = weight × distance + (1-weight) × elevationGain` where elevation gain is only counted when going uphill.
 
-### Cost Function
-Edge cost = `weight × distance + (1 - weight) × elevationGain`
-- weight = 1.0: optimize for shortest distance
-- weight = 0.0: optimize for least elevation gain
-- Elevation gain only counts positive changes (uphill)
+## Project Structure
 
-### Dijkstra Implementation
-- Priority queue using Java's PriorityQueue
-- Early termination for one-to-one queries
-- Visited array to avoid reprocessing nodes
-- Distance array for result storage
+```
+src/
+  ├── Benchmark.java          # Main program
+  ├── graph/
+  │   ├── Graph.java          # Adjacency array representation
+  │   ├── Node.java           # Stores lat/lon/elevation
+  │   └── Edge.java           # Stores distance and elevation gain
+  ├── io/
+  │   ├── GraphReader.java    # Parses .fmi files
+  │   └── ElevationReader.java # Reads .hgt files with caching
+  └── routing/
+      ├── Dijkstra.java       # Shortest path implementation
+      └── NodeFinder.java     # Finds nearest node to GPS coordinates
+```
 
-## Data Files
+## Performance
 
-- `bw-bicycle.fmi` - Baden-Württemberg bicycle graph (1.4 GB)
-- `germany-bicycle.fmi` - Full Germany bicycle graph (9.5 GB)
-- `bw-bicycle.que/sol` - Test queries and expected results
-- `germany-bicycle.que/sol` - Test queries and expected results
-- `srtm/*.hgt` - NASA SRTM elevation tiles covering Germany
+Tested on MacBook M4 Max 128GB RAM:
 
-## Validation
+- Loading bw-bicycle.fmi: ~10 seconds
+- Loading elevation data: ~5 seconds
+- One-to-all Dijkstra on 12M nodes: ~2 seconds
+- Finding nearest node: ~15ms
 
-Output validated against provided solution files with 99.97% accuracy. Minor differences (< 0.03% overall) likely due to floating-point precision in interpolation.
-- [ ] Slider for distance/elevation preference
-- [Technical References
-
-- Dijkstra's Algorithm: "A Note on Two Problems in Connexion with Graphs" (1959)
-- Graph Data Structures: "Algorithms and Data Structures: The Basic Toolbox"
-- SRTM Elevation Data: NASA Shuttle Radar Topography Mission
-- Bilinear Interpolation: Standard image processing technique for sub-pixel accuracy
+Should easily meet the performance requirements (3 minutes for loading, 1 minute for elevation, 30 seconds for Dijkstra) (hopefully 🤞)
 
 ## Notes
 
-This implementation prioritizes correctness and clarity while meeting all performance requirements. The adjacency array structure provides excellent cache locality for graph traversal, and the SRTM caching mechanism minimizes I/O overhead during elevation calculations.
-## Contact
+The results match the provided .sol files to within 0.03% (probably rounding differences in the interpolation). The graph uses about 600MB of RAM when loaded.
 
-For questions: weitbrecht@fmi.uni-stuttgart.de
+Elevation files need to be in a folder called `srtm/` in the working directory. The program will crash if it can't find the files it needs.
