@@ -1,17 +1,16 @@
 package routing;
 
-import graph.Graph;
 import graph.Edge;
-
+import graph.Graph;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
- * Implements Dijkstra's shortest path algorithm
+ * Implements Dijkstras shortest path algorithm
  * 
  * Supports two modes:
- * - One-to-one: Find shortest path from source to specific target
- * - One-to-all: Find shortest paths from source to all nodes
+ * - One to one: Find shortest path from source to specific target
+ * - One to all: Find shortest paths from source to all nodes
  */
 
 public class Dijkstra {
@@ -19,6 +18,7 @@ public class Dijkstra {
     private final Graph graph;
     private long[] distances;
     private boolean[] visited;
+    private int settledNodesCount = 0;
     
     /**
      * Entry in the priority queue for Dijkstra algorithm
@@ -41,7 +41,7 @@ public class Dijkstra {
     }
     
     /**
-     * Creates a Dijkstra instance for the given graph
+     * Creates a Dijkstra instance
      * 
      * @param graph The graph to perform searches on
      */
@@ -54,7 +54,7 @@ public class Dijkstra {
     
     /**
      * Computes shortest path from source to target node
-     * Stops as soon as target is reached (one-to-one)
+     * Stops as soon as target is reached (one to one)
      * 
      * @param sourceId Source node ID
      * @param targetId Target node ID
@@ -66,6 +66,7 @@ public class Dijkstra {
 
         Arrays.fill(distances, Long.MAX_VALUE);
         Arrays.fill(visited, false);
+        settledNodesCount = 0;
         
         distances[sourceId] = 0;
         
@@ -86,6 +87,7 @@ public class Dijkstra {
             }
             
             visited[currentNode] = true;
+            settledNodesCount++;
             
             Edge[] edges = graph.getEdgeArray();
             int edgeStart = graph.getEdgeStart(currentNode);
@@ -109,12 +111,11 @@ public class Dijkstra {
             }
         }
         
-        // Target not reachable
         return -1;
     }
     
     /**
-     * Computes shortest paths from source to all nodes (one-to-all)
+     * Computes shortest paths from source to all nodes (one to all)
      * Does not stop early explores the entire graph
      * 
      * @param sourceId Source node ID
@@ -184,5 +185,9 @@ public class Dijkstra {
     
     public long[] getAllDistances() {
         return distances;
+    }
+
+    public int getSettledNodesCount() {
+        return settledNodesCount;
     }
 }

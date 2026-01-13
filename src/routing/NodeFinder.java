@@ -4,14 +4,14 @@ import graph.Graph;
 import graph.Node;
 
 /**
- * Finds the nearest graph node to a given geographic coordinate.
+ * Finds the nearest graph node to a given geographic coordinate
  */
 public class NodeFinder {
     
     private final Graph graph;
     
     /**
-     * Creates a NodeFinder for the given graph.
+     * Creates a NodeFinder
      * 
      * @param graph The graph to search
      */
@@ -20,8 +20,8 @@ public class NodeFinder {
     }
     
     /**
-     * Finds the nearest node to the given coordinates.
-     * Uses naive O(n) linear search with Euclidean distance.
+     * Finds the nearest node to the given coordinates
+     * Uses naive O(n) linear search with Euclidean distance
      * 
      * @param latitude Target latitude
      * @param longitude Target longitude
@@ -51,7 +51,7 @@ public class NodeFinder {
     }
     
     /**
-     * Finds nearest node and returns its coordinates.
+     * Finds nearest node and returns its coordinates
      * 
      * @param latitude Target latitude
      * @param longitude Target longitude
@@ -69,8 +69,8 @@ public class NodeFinder {
     }
     
     /**
-     * Calculates Euclidean distance between two points.
-     * This is an approximation suitable for finding nearest nodes.
+     * Calculates Euclidean distance between two points
+     * This is an approximation suitable for finding nearest nodes
      * 
      * @param lat1 First latitude
      * @param lon1 First longitude
