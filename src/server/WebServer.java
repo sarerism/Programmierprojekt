@@ -20,8 +20,8 @@ import routing.NodeFinder;
 import routing.RouteService;
 
 /**
- * Simple HTTP server for the bicycle route planner.
- * Serves static files and provides REST API for routing.
+ * Simple HTTP server :))
+ * Serves static files and provides REST API for routing
  */
 public class WebServer {
     
@@ -43,15 +43,13 @@ public class WebServer {
     public void start() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         
-        // API endpoints
         server.createContext("/nearest", new NearestHandler());
         server.createContext("/route", new RouteHandler());
         server.createContext("/bounds", new BoundsHandler());
         
-        // Static file handler (for index.html)
         server.createContext("/", new StaticFileHandler());
         
-        server.setExecutor(null); // Use default executor
+        server.setExecutor(null);
         server.start();
         
         System.out.println("Server started on http://localhost:" + port);
@@ -60,7 +58,7 @@ public class WebServer {
     
     /**
      * Handler for /nearest endpoint
-     * GET /nearest?lat=48.746&lon=9.098
+     * GET /nearest?lat=xx.xxxx&lon=yy.yyyy
      */
     private class NearestHandler implements HttpHandler {
         @Override
@@ -96,7 +94,7 @@ public class WebServer {
     
     /**
      * Handler for /route endpoint
-     * GET /route?from=638394&to=123456&slider=0.42
+     * GET /route?from=xxxxxxx&to=yyyyyyy&slider=0.xx
      */
     private class RouteHandler implements HttpHandler {
         @Override
@@ -138,7 +136,6 @@ public class WebServer {
             }
             
             try {
-                // Calculate bounds from all nodes
                 double minLat = Double.MAX_VALUE;
                 double maxLat = -Double.MAX_VALUE;
                 double minLon = Double.MAX_VALUE;
@@ -184,17 +181,14 @@ public class WebServer {
                 path = "/index.html";
             }
             
-            // Security: Prevent path traversal attacks
             if (path.contains("..") || path.contains("//")) {
                 sendResponse(exchange, 403, "Forbidden");
                 return;
             }
             
-            // Only allow files from web directory
             File webDir = new File("web").getCanonicalFile();
             File file = new File(webDir, path).getCanonicalFile();
             
-            // Ensure the file is within web directory
             if (!file.getCanonicalPath().startsWith(webDir.getCanonicalPath())) {
                 sendResponse(exchange, 403, "Forbidden");
                 return;
@@ -272,7 +266,6 @@ public class WebServer {
                 }
             }
             
-            // If no graph path provided, ask user
             if (graphPath == null) {
                 System.out.print("Enter path to graph file (.fmi): ");
                 Scanner scanner = new Scanner(System.in);
@@ -288,13 +281,11 @@ public class WebServer {
             
             System.out.println("Loading graph from: " + graphPath);
             
-            // Load graph
             GraphReader reader = new GraphReader();
             Graph graph = reader.readGraph(graphPath);
             
             System.out.println("Graph loaded: " + graph);
             
-            // Load elevation data
             File srtmDir = new File(graphFile.getParent(), "srtm");
             if (srtmDir.exists() && srtmDir.isDirectory()) {
                 System.out.println("Loading elevation data from: " + srtmDir.getAbsolutePath());
@@ -320,14 +311,12 @@ public class WebServer {
                 long elevEnd = System.currentTimeMillis();
                 System.out.println("Elevation data loaded in " + (elevEnd - elevStart) + "ms");
                 
-                // Update edge elevations
                 GraphReader.updateEdgeElevations(graph);
                 System.out.println("Edge elevations updated");
             } else {
                 System.out.println("Warning: SRTM directory not found, elevation data not loaded");
             }
             
-            // Start server
             WebServer server = new WebServer(graph, port);
             server.start();
             

@@ -1,19 +1,17 @@
 package routing;
 
-import graph.Graph;
 import graph.Edge;
-import graph.Node;
-import routing.RouteService.RouteResult;
-
-import java.util.Arrays;
+import graph.Graph;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
+import routing.RouteService.RouteResult;
 
 /**
- * Extended Dijkstra implementation with path reconstruction.
- * Computes shortest paths and tracks predecessors to reconstruct routes.
+ * Extended Dijkstra implementation with path reconstruction
+ * Computes shortest paths and tracks predecessors to reconstruct routes
  */
 public class DijkstraWithPath {
     
@@ -48,8 +46,8 @@ public class DijkstraWithPath {
     }
     
     /**
-     * Computes route from source to target and reconstructs the path.
-     * Also calculates total distance and elevation gain along the path.
+     * Computes route from source to target and reconstructs the path
+     * Also calculates total distance and elevation gain along the path
      * 
      * @param sourceId Source node ID
      * @param targetId Target node ID
@@ -57,17 +55,14 @@ public class DijkstraWithPath {
      * @return RouteResult with path and metrics, or null if no route exists
      */
     public RouteResult computeRoute(int sourceId, int targetId, double weight) {
-        // Run Dijkstra one-to-one
         boolean found = runDijkstra(sourceId, targetId, weight);
         
         if (!found) {
             return null;
         }
-        
-        // Reconstruct path
+
         List<Integer> path = reconstructPath(sourceId, targetId);
         
-        // Calculate actual distance and elevation gain along the path
         long totalDistance = 0;
         long totalElevationGain = 0;
         
@@ -75,7 +70,6 @@ public class DijkstraWithPath {
             int currentNode = path.get(i);
             int nextNode = path.get(i + 1);
             
-            // Find the edge from currentNode to nextNode
             Edge edge = findEdge(currentNode, nextNode);
             
             if (edge != null) {
@@ -106,7 +100,6 @@ public class DijkstraWithPath {
             DijkstraEntry current = pq.poll();
             int currentNode = current.nodeId;
             
-            // Early termination when target is reached
             if (currentNode == targetId) {
                 return true;
             }
@@ -117,7 +110,7 @@ public class DijkstraWithPath {
             
             visited[currentNode] = true;
             
-            // Explore neighbors
+
             Edge[] edges = graph.getEdgeArray();
             int edgeStart = graph.getEdgeStart(currentNode);
             int edgeEnd = graph.getEdgeEnd(currentNode);
@@ -141,7 +134,7 @@ public class DijkstraWithPath {
             }
         }
         
-        return false; // Target not reachable
+        return false; 
     }
     
     /**

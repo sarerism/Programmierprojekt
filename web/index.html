@@ -663,8 +663,9 @@
         // Initialize Map
         const map = L.map('map').setView([48.7758, 9.1829], 12); // Stuttgart
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
+        // FMI Tile Server (Requirement 8)
+        L.tileLayer('https://tiles.fmi.uni-stuttgart.de/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors, FMI Stuttgart',
             maxZoom: 19
         }).addTo(map);
 
